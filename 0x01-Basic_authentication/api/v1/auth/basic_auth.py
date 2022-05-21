@@ -3,13 +3,12 @@
 from api.v1.auth.auth import Auth
 from base64 import b64decode
 from models.user import User
+from typing import List, TypeVar
+from flask import request
 
 
 class BasicAuth(Auth):
     """auth class"""
-    from flask import request
-    from typing import List, TypeVar
-
     def require_auth(self, path: str, excluded_paths: List[str]) -> bool:
         """public method returning a bool"""
         if path is None or excluded_paths is None or len(excluded_paths) == 0:
@@ -89,5 +88,17 @@ class BasicAuth(Auth):
             for user in users:
                 if user.is_valid_password(user_pwd):
                     return user
+        except Exception:
+            return None
+
+    def current_user(self, request=None) -> TypeVar('User'):
+        """returns the User object"""
+        try:
+            header = self.authorization_header(request)
+            string = self.extract_base64_authorization_header(header)
+            autho = self.decode_base64_authorization_header(string)
+            creds = self.extract_user_credentials(auth0)
+            user = self.user_object_from_credentials(creds[0], creds[1])
+            return user
         except Exception:
             return None

@@ -26,6 +26,7 @@ if getenv('AUTH_TYPE') == 'basic_auth':
 
 @app.before_request
 def before_request_handler():
+    """handles before request functionality"""
     if auth is not None:
         paths = ['/api/v1/status/',
                  '/api/v1/unauthorized/',
@@ -45,7 +46,7 @@ def not_found(error) -> str:
 
 
 @app.errorhandler(401)
-def unauthrized(error) -> str:
+def unauthorized(error) -> str:
     """ Unauthorized handler
     """
     return jsonify({"error": "Unauthorized"}), 401
