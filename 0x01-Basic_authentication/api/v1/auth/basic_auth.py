@@ -97,7 +97,7 @@ class BasicAuth(Auth):
             header = self.authorization_header(request)
             string = self.extract_base64_authorization_header(header)
             autho = self.decode_base64_authorization_header(string)
-            creds = self.extract_user_credentials(auth0)
+            creds = self.extract_user_credentials(autho)
             user = self.user_object_from_credentials(creds[0], creds[1])
             return user
         except Exception:
