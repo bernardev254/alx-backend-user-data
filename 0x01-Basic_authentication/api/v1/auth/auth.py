@@ -15,7 +15,7 @@ class Auth():
         for my_path im excluded_paths:
             if my_path[-1] is *:
                 if my_path[:-1] in path:
-                    return False
+                    path = my_path
 
         if path in excluded_paths or path + "/" in excluded_paths:
             return False
