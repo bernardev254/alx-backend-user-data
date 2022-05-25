@@ -49,8 +49,7 @@ class Auth:
         """uuid generator"""
         import uuid
 
-        x = uuid.uuid4()
-        return x
+        return uuid.uuid4()
 
     def create_session(self, email: str) -> str:
         """creates a session id and stores it in the db"""
