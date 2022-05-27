@@ -4,6 +4,8 @@ from sqlalchemy.orm.exc import NoResultFound
 import bcrypt
 from db import DB
 from user import User
+import uuid
+from typing import Union
 
 
 def _hash_password(password: str) -> bytes:
@@ -11,6 +13,10 @@ def _hash_password(password: str) -> bytes:
     password = password.encode('utf-8')
     hashed = bcrypt.hashpw(password, bcrypt.gensalt())
     return hashed
+
+def _generate_uuid() -> str:
+    """universal unique id generator"""
+    return str(uuid.uuid4())
 
 
 class Auth:
@@ -45,18 +51,29 @@ class Auth:
         except NoResultFound:
             return False
 
-    def _generate_uuid(self) -> str:
-        """uuid generator"""
-        import uuid
-
-        return str(uuid.uuid4())
-
     def create_session(self, email: str) -> str:
         """creates a session id and stores it in the db"""
         try:
             user = self.db.find_user_by(email=email)
-            my_session_id = self._generate_uuid()
+            my_session_id = _generate_uuid()
             self.db.update_user(user.id, session_id=my_session_id)
             return my_session_id
         except Exception:
             pass
+
+    def find_user_by_session_id(self, session_id: str) -> Union[User, None]:
+        """find user by session id returning the user"""
+        try:
+            user = self.db.find_user_by(session_id=session_id)
+            return user
+        except Exception:
+            return None
+        
+    def destroy_session(self, user_id: int) -> None:
+        """session destroyer"""
+        try:
+            user = self.db.update(user_id, session_id=None)
+            return None
+        except Exception:
+            pass
+            

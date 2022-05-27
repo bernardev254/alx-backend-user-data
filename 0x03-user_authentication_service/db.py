@@ -57,7 +57,6 @@ class DB:
                     if not hasattr(User, k):
                         raise ValueError
                     user.k = v
-                    self._session.add(user)
                     self._session.commit()
             except NoResultFound:
                 pass
