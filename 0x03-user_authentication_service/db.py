@@ -56,7 +56,14 @@ class DB:
                 for k, v in kwargs.items():
                     if not hasattr(User, k):
                         raise ValueError
-                    user.k = v
+                    user.k = str(v)
+                    print(user.k)
                     self._session.commit()
             except NoResultFound:
-                pass
+                print("updating failed")
+
+    def up(self, user_id: int, **kwargs) -> None:
+        user = self.find_user_by(id=int(user_id))
+        for key, value in kwargs.items():
+            user.key = str(value)
+        self._session.commit()

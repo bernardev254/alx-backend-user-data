@@ -59,10 +59,34 @@ def user_profile() -> str:
         user = AUTH.db.find_user_by(session_id=my_session_id)
         return jsonify({"email": user.email}), 200
     except Exception:
-        return jsonify({"my_session_id": my_session_id})
-        #return jsonify({"user.session_id": user.session_id})
-        #abort(403)
-   
+        abort(403)
+
+
+@app.route("/reset_password", methods=["POST"], strict_slashes=False)
+def get_reset_password_token() -> str:
+    """reset password token route"""
+    my_email = request.form['email']
+    try:
+        user = AUTH.db.find_user_by(email=my_email)
+        reset_t = AUTH.create_session(my_email)
+        return jsonify({"email": my_email, "reset_token": reset_t}), 200
+    except Exception:
+        abort(403)
+
+
+@app.route("/reset_password", methods=["PUT"], strict_slashes=False)
+def update_password() -> str:
+    """reset password put route"""
+    my_email = request.form.get('email')
+    reset_t = request.form.get('reset_token')
+    new_password = request.form.get('new_password')
+    try:
+        user = AUTH.db.find_user_by(reset_token=reset_token)
+        return jsonify({"email": "<user email>",
+                       "message": "Password updated"}), 200
+    except Exception:
+        abort(403)
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port="5000")

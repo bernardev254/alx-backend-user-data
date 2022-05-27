@@ -14,6 +14,7 @@ def _hash_password(password: str) -> bytes:
     hashed = bcrypt.hashpw(password, bcrypt.gensalt())
     return hashed
 
+
 def _generate_uuid() -> str:
     """universal unique id generator"""
     return str(uuid.uuid4())
@@ -68,7 +69,7 @@ class Auth:
             return user
         except Exception:
             return None
-        
+
     def destroy_session(self, user_id: int) -> None:
         """session destroyer"""
         try:
@@ -76,4 +77,23 @@ class Auth:
             return None
         except Exception:
             pass
-            
+
+    def get_reset_password(self, email: str) -> str:
+        """creates a reset token and stores it in the db"""
+        try:
+            user = self.db.find_user_by(email=email)
+            my_reset_token = _generate_uuid()
+            self.db.update_user(user.id, reset_token=my_reset_token)
+            return my_reset_token
+        except Exception:
+            raise ValueError
+
+    def update_password(self, reset_token: str, password: str) -> None:
+        """updates the password using the reset password token"""
+        try:
+            user = self.db.find_user_by(reset_token=reset_token)
+            hashed_p = self._hash_password(password)
+            self.db.update_user(user.id, reset_token=None,
+                                hashed_password=hashed_p)
+        except Exception:
+            raise ValueError
